@@ -6,6 +6,7 @@ const LedgerSchema = new Schema({
     date: Date,
     account_type: String,
     gl_account_name: String,
+    description: String,
     vendor: String,
     debit: Number,
     credit: Number
