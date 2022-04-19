@@ -27,6 +27,15 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const fs = require('fs');
+            const path = require('path');
+            var json = JSON.parse(fs.readFileSync('./releasenotes.json').toString());
+            var html = "";
+              for(const coin in json){
+                  html += "<h1>"+coin+"</h1>";
+                  html += json[coin].wall+"<br>";
+                  html += json[coin].scan+"<br>";
+              }
               const response = await github.repos.getReleaseByTag({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -36,5 +45,5 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 release_id: response.data.id,
-                description: "vidyut"
+                description: html
               });
