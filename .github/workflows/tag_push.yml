@@ -1,0 +1,61 @@
+name: RELEASE
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CHECKOUT
+        uses: actions/checkout@v2
+      - name: RELEASE
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            var json = JSON.parse(fs.readFileSync('./releasenotes.json').toString());
+            var html = "";
+              for(const coin in json){
+                  html += "<h1>"+coin+"</h1>";
+                  html += json[coin].wall+"<br>";
+                  html += json[coin].scan+"<br>";
+              }
+            console.log(html);
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const tag = process.env.GITHUB_REF_NAME;
+            const release = await github.rest.repos.createRelease({
+                owner, repo,
+                tag_name: tag,
+                body: html,
+                prerelease: false
+                });
+# name: Create Release
+# on:
+#   push:
+#     tags:
+#       - 'v*'
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Set env
+#         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+#       - name: PRERELEASE
+#         uses: actions/github-script@v2
+#         with:
+#           github-token: ${{secrets.GITHUB_TOKEN}}
+#           script: |
+#               const response = await  github.repos.createRelease({
+#                 owner: context.repo.owner,
+#                 repo: context.repo.repo,
+#                 tag: ${{github.ref_name}},
+#                 body: "new body",
+#                 prerelease: true
+#               });
