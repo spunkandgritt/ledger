@@ -11,6 +11,18 @@ jobs:
     steps:
       - name: CHECKOUT
         uses: actions/checkout@v2
+      - name: GET NETWORK NAME
+        id: network-name      
+        uses: actions/github-script@v6
+        with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: | 
+          const tag = process.env.GITHUB_REF_NAME;
+          const regex = /(?eth|celo|etc|matic|rsk)$/;
+          const network = tag.match(regex);
+          return network;
+      - name: Get result
+        run: echo "${{steps.network-name.outputs.result}}"
       - name: RELEASE
         uses: actions/github-script@v6
         with:
